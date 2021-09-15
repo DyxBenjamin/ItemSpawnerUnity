@@ -8,7 +8,7 @@ namespace ItemSpawner.Editor
     public class DatabaseInspector : UnityEditor.Editor
     {
         private Database _dataBase;
-        private string _searchString = null;
+        private string _searchString;
         private bool _shouldSearch;
 
         private void OnEnable()
@@ -17,34 +17,32 @@ namespace ItemSpawner.Editor
         public override void OnInspectorGUI()
         {
             //base.DrawDefaultInspector(); dibujo de inspector por default
-            if (_dataBase)
-            {
-                //Conteo de items
+            if (!_dataBase) return;
+            
+            //Conteo de items
+            EditorGUILayout.BeginHorizontal("box");
+            GUILayout.Label("Items guardados: " + _dataBase.items.Count);
+            EditorGUILayout.EndHorizontal();
+
+            //Caja de busqueda
+            if (_dataBase.items.Count > 0) {
                 EditorGUILayout.BeginHorizontal("box");
-                GUILayout.Label("Items guardados: " + _dataBase.Items.Count);
-                EditorGUILayout.EndHorizontal();
+                GUILayout.Label("Search: "); _searchString = GUILayout.TextField(_searchString);
+                EditorGUILayout.EndHorizontal(); }
 
-                //Caja de busqueda
-                if (_dataBase.Items.Count > 0) {
-                    EditorGUILayout.BeginHorizontal("box");
-                    GUILayout.Label("Search: "); _searchString = GUILayout.TextField(_searchString);
-                    EditorGUILayout.EndHorizontal(); }
-
-                if (GUILayout.Button("Nuevo item")){ItemWindow.ShowEmptyWindow(_dataBase); //boton de nuevo item
-                }
-
-                //busqueda de items
-                if (System.String.IsNullOrEmpty(_searchString) == true)
-                {_shouldSearch = false;}else {_shouldSearch = true;}
-
-                foreach (Database.Item item in _dataBase.Items)
-                {if (_shouldSearch == true){
-                        if (item.Nombre == _searchString || item.Nombre.Contains(_searchString) || item.id.ToString() == _searchString)
-                        { DisplayItem(item);}}
-                    else{DisplayItem(item);}}
-
-                if (_deletedItem != null) {_dataBase.Items.Remove(_deletedItem);} //Eliminar item
+            if (GUILayout.Button("Nuevo item")){ItemWindow.ShowEmptyWindow(_dataBase); //boton de nuevo item
             }
+
+            //busqueda de items
+            _shouldSearch = string.IsNullOrEmpty(_searchString) != true;
+
+            foreach (var item in _dataBase.items)
+            {if (_shouldSearch){
+                    if (item.name == _searchString || item.name.Contains(_searchString) || item.id.ToString() == _searchString)
+                    {DisplayItem(item);}}
+                else{DisplayItem(item);}}
+
+            if (_deletedItem != null) {_dataBase.items.Remove(_deletedItem);} //Eliminar item
         }
 
         private Database.Item _deletedItem;
@@ -52,24 +50,24 @@ namespace ItemSpawner.Editor
         public void DisplayItem(Database.Item item){
             
             //Definicion de estilo de etiqueta
-            GUIStyle tagStyle = new GUIStyle(GUI.skin.label);
+            var tagStyle = new GUIStyle(GUI.skin.label);
             tagStyle.wordWrap = true;
             tagStyle.alignment = TextAnchor.MiddleLeft;
             tagStyle.fixedWidth = 100;
 
             //Definicion de estilo de etiqueta
-            GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+            var labelStyle = new GUIStyle(GUI.skin.label);
             labelStyle.wordWrap = true;
             labelStyle.alignment = TextAnchor.MiddleLeft;
          
             //Definicion de estilo de etiqueta de referencias
-            GUIStyle valueStyle = new GUIStyle(GUI.skin.label);
+            var valueStyle = new GUIStyle(GUI.skin.label);
             valueStyle.wordWrap = true;
             valueStyle.alignment = TextAnchor.MiddleLeft;
             //valueStyle.margin = new RectOffset(0 ,50 ,0 ,0);
             
             //Definicion de estilo de botones
-            GUIStyle butonStyle = new GUIStyle(GUI.skin.button);
+            var butonStyle = new GUIStyle(GUI.skin.button);
             butonStyle.wordWrap = true;
             butonStyle.alignment = TextAnchor.MiddleCenter;
             butonStyle.margin = new RectOffset(0 ,0 ,5 ,5);
@@ -82,14 +80,14 @@ namespace ItemSpawner.Editor
 
             //Campo de nombre
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Nombre: ", tagStyle); GUILayout.Label(item.Nombre, labelStyle);
+            GUILayout.Label("Nombre: ", tagStyle); GUILayout.Label(item.name, labelStyle);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
         
             //Campo de descripcion
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Descripcion: ", tagStyle); GUILayout.Label(item.Descripcion, labelStyle);
+            GUILayout.Label("Descripcion: ", tagStyle); GUILayout.Label(item.description, labelStyle);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
@@ -101,7 +99,7 @@ namespace ItemSpawner.Editor
         
             //Campo de probabilidad
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Probabilidad: ", tagStyle); GUILayout.Label(item.Probabilidad.ToString(CultureInfo.CurrentCulture), valueStyle);
+            GUILayout.Label("Probabilidad: ", tagStyle); GUILayout.Label(item.probability.ToString(CultureInfo.CurrentCulture), valueStyle);
             EditorGUILayout.EndHorizontal();
         
             EditorGUILayout.Space();

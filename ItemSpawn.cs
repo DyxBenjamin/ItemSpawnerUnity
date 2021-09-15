@@ -4,74 +4,89 @@ namespace ItemSpawner
 {
     public class ItemSpawn : MonoBehaviour
     {
-        public bool Activo = true;
-        public Transform[] Ubicaciones;
-        [Range(1, 100)] public int ItemsPorCiclo;
-        [Range(0, 400)] public int ItemsMaximos = 0;
-        [Range(0, 50)] public float TiempoEntreItems = 2;
-        [SerializeField] private Database MobsDatabase;
+        public bool enable = true;
+        public Transform spawnPoint;
+        [Range(1, 100)] public int loopItems;
+        [Range(0, 400)] public int maxItems = 0;
+        [Range(0, 50)] public float timeBetweenItems = 2;
+        [SerializeField] private Database itemsDatabase;
 
         private float IncrementoDeTiempo = 0,
             TiempoSpawnMinimo = 0.65f,
-            timeWaitNew = 1;
-        [HideInInspector]public float MobsSpawned = 0;
-        [HideInInspector] public float MobsEnEscena = 0;
+            timeWait = 1;
+
+        [HideInInspector] public float itemsSpawned;
+        [HideInInspector] public float itemsOnScene = 0;
 
 
-        private double rnd = 0;
-        private int ranSpawn = 0;
-        private double[] Acumulado;
-        private int itemC = 2;
-        private int tamaño = 0;
+        private double _rnd = 0;
+        public int _ranSpawn = 0;
+        private double[] _cumulativeProbability;
+        private int _itemC = 2;
+        private int _sizeDatabase = 0;
 
 
         private void Awake()
         {
             //Calculamos el tiempo de lanzamiento. 
-            timeWaitNew = TiempoEntreItems + Random.Range(0, IncrementoDeTiempo);
+            timeWait = timeBetweenItems + Random.Range(0, IncrementoDeTiempo);
         }
 
-        void Start()
+        private void Start()
         {
-            tamaño = MobsDatabase.Items.Count ;
-            Acumulado = new double[tamaño];
-            foreach (Database.Item Enemigo in MobsDatabase.Items) { if (Enemigo.id == 0) { Acumulado[Enemigo.id] = Enemigo.Probabilidad; } else { Acumulado[Enemigo.id] = Acumulado[Enemigo.id - 1] + Enemigo.Probabilidad; } }
-    
-        } 
-
-        void Update()
-        {
-            if (timeWaitNew <= 0 && (ItemsMaximos == 0 || ItemsMaximos > MobsSpawned) && Activo == true)
+            _sizeDatabase = itemsDatabase.items.Count;
+            _cumulativeProbability = new double[_sizeDatabase];
+            foreach (var item in itemsDatabase.items)
             {
-                for (int i = 1; i <= ItemsPorCiclo && (ItemsMaximos == 0 || ItemsMaximos > MobsSpawned); i++) { ItemInstance(); }
-
-                //  if (IncreaseSpawn >= 0 && TiempoEntreItems > TiempoSpawnMinimo) { TiempoEntreItems -= ItemsPorCiclo; }
-
-                timeWaitNew = TiempoEntreItems;
-
-                if (IncrementoDeTiempo > 0f) { timeWaitNew += Random.Range(0, IncrementoDeTiempo); }
-
-                if (timeWaitNew < TiempoSpawnMinimo) { timeWaitNew = TiempoSpawnMinimo; }
-
+                _cumulativeProbability[item.id] =  (item.id == 0)  ? item.probability : _cumulativeProbability[item.id - 1] + item.probability;
             }
-            else { timeWaitNew -= Time.deltaTime; }
+        }
+
+        private void Update()
+        {
+            if (timeWait <= 0 && (maxItems == 0 || maxItems > itemsSpawned) && enable == true)
+            {
+                for (var i = 1; i <= loopItems && (maxItems == 0 || maxItems > itemsSpawned); i++)
+                {
+                    ItemInstance();
+                }
+
+                timeWait = timeBetweenItems;
+
+                if (IncrementoDeTiempo > 0f)
+                {
+                    timeWait += Random.Range(0, IncrementoDeTiempo);
+                }
+
+                if (timeWait < TiempoSpawnMinimo)
+                {
+                    timeWait = TiempoSpawnMinimo;
+                }
+            }
+            else
+            {
+                timeWait -= Time.deltaTime;
+            }
         }
 
         // Generar objetos
-        void ItemInstance()
+        private void ItemInstance()
         {
             var itemIndex = 0;
             //Analisis de variable discreta
-            rnd = Random.Range(0, (float)Acumulado[tamaño - 1]);
-            for (int j = 0; j <= tamaño - 1; j++) { if (rnd < Acumulado[j]) { itemIndex = j; break; } }
+            _rnd = Random.Range(0, (float) _cumulativeProbability[_sizeDatabase - 1]);
+            for (var j = 0; j <= _sizeDatabase - 1; j++)
+            {
+                if (!(_rnd < _cumulativeProbability[j])) continue;
+                itemIndex = j;
+                break;
+            }
 
-            ranSpawn = Random.Range(0, Ubicaciones.Length); //Seleccion de un punto de spawn
+            //Seleccion de un punto de spawn
 
-            Instantiate(MobsDatabase.FindItem(itemIndex).prefab, Ubicaciones[ranSpawn].position, Quaternion.identity); MobsSpawned += 1; MobsEnEscena += 1;
+            Instantiate(itemsDatabase.FindItem(itemIndex).prefab, spawnPoint.position, Quaternion.identity);
+            itemsSpawned += 1;
+            itemsOnScene += 1;
         } //instanciar un objeto
     }
 }
-
-
-
-

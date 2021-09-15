@@ -18,14 +18,11 @@ namespace ItemSpawner.Editor
             window.minSize = new Vector2(300, 350);
             newItem = new Database.Item();
             newItem.id = item.id;
-            newItem.Nombre = item.Nombre;
-            newItem.id = item.id;
-            newItem.Descripcion = item.Descripcion;
+            newItem.name = item.name;
+            newItem.description = item.description;
             newItem.prefab = item.prefab;
-            newItem.Probabilidad = item.Probabilidad;
-
-
-        }
+            newItem.probability = item.probability;
+            }
 
         public void OnGUI(){
             DisplayItem(newItem);
@@ -39,10 +36,10 @@ namespace ItemSpawner.Editor
             //reasignacion de valores
             Undo.RecordObject(database,"Item Edit");
             itemToEdit = database.FindItem(newItem.id);
-            itemToEdit.Nombre = newItem.Nombre;
-            itemToEdit.Descripcion = newItem.Descripcion;
+            itemToEdit.name = newItem.name;
+            itemToEdit.description = newItem.description;
             itemToEdit.prefab = newItem.prefab;
-            itemToEdit.Probabilidad = newItem.Probabilidad;
+            itemToEdit.probability = newItem.probability;
             EditorUtility.SetDirty(database);
 
             window.Close();
@@ -72,7 +69,7 @@ namespace ItemSpawner.Editor
             //Campo de nombre
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Nombre: ");
-            item.Nombre = GUILayout.TextField(item.Nombre, TextAreaStyle,options);
+            item.name = GUILayout.TextField(item.name, TextAreaStyle,options);
             EditorGUILayout.EndHorizontal();
 
             //Campo de Objeto
@@ -83,12 +80,12 @@ namespace ItemSpawner.Editor
 
             //Campo de descripcion
             GUILayout.Label("Descripcion: ");
-            item.Descripcion = EditorGUILayout.TextArea(item.Descripcion, TextAreaStyle, GUILayout.MinHeight(100));
+            item.description = EditorGUILayout.TextArea(item.description, TextAreaStyle, GUILayout.MinHeight(100));
 
             //Campo de probabilidad
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Probabilidad: ");
-            item.Probabilidad = EditorGUILayout.FloatField(item.Probabilidad,TextAreaStyle, options);
+            item.probability = EditorGUILayout.FloatField(item.probability,TextAreaStyle, options);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.EndVertical();

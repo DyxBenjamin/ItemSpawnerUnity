@@ -23,7 +23,7 @@ namespace ItemSpawner.Editor
         { DisplayItem(newItem);
             if (GUILayout.Button("Nuevo item"))
             {
-                addItem();
+                AddItem();
             }
             if (GUILayout.Button("Cancelar"))
             {
@@ -31,8 +31,8 @@ namespace ItemSpawner.Editor
             }
         }
 
-        private void addItem() {
-            Undo.RecordObject(database, "Item add");
+        private static void AddItem() {
+            Undo.RecordObject(_database, "Item add");
 
             database.Items.Add(newItem);
             EditorUtility.SetDirty(database);
@@ -63,7 +63,7 @@ namespace ItemSpawner.Editor
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Nombre: ");
-            item.Nombre = GUILayout.TextField(item.Nombre, TextAreaStyle,options);
+            item.name = GUILayout.TextField(item.name, textAreaStyle,_options);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -72,11 +72,11 @@ namespace ItemSpawner.Editor
             EditorGUILayout.EndHorizontal();
 
             GUILayout.Label("Descripcion: ");
-            item.Descripcion = EditorGUILayout.TextArea(item.Descripcion, TextAreaStyle, GUILayout.MinHeight(100));
+            item.description = EditorGUILayout.TextArea(item.description, textAreaStyle, GUILayout.MinHeight(100));
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Probabilidad: ");
-            item.Probabilidad = EditorGUILayout.FloatField(item.Probabilidad,TextAreaStyle, options);
+            item.probability = EditorGUILayout.FloatField(item.probability,textAreaStyle, _options);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.EndVertical();

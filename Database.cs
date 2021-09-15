@@ -1,23 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Item spawner/Database")]
-public class Database : ScriptableObject
+namespace ItemSpawner
 {
-
-    public List<Item> Items = new List<Item>();
-    [System.Serializable]
-    public class Item
+    [CreateAssetMenu(menuName = "Item spawner/Database")]
+    public class Database : ScriptableObject
     {
-        public int id;
-        public string Nombre;
-        [TextArea(1,3)]public string Descripcion;
-        public Object prefab;
-        public float Probabilidad;
-    }
-  
-    public Item FindItem(int id){foreach (Item item in Items){if (item.id == id){return item; }}return null;}
 
+        public List<Item> items = new List<Item>();
+        [System.Serializable]
+        public class Item
+        {
+            public int id;
+            public string name;
+            [TextArea(1,3)]public string description;
+            public Object prefab;
+            public float probability;
+        }
+  
+        public Item FindItem(int id)
+        {
+            return items.FirstOrDefault(item => item.id == id);
+        }
+
+    }
 }
 
